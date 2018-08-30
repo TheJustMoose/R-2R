@@ -839,3 +839,44 @@ const PROGMEM unsigned char wav[size] = {
 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 
 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80 };
 
+// DAC on the 595 + R-2R
+const int REG_DATA = 7;    // PK5 == A15
+const int REG_CLK = 6;     // PK6 == A14
+const int REG_LATCH = 5;   // PK7 == A13
+#define REG_PORT PORTK
+#define REG_DIRECTION DDRK
+
+// Write one value to DAC
+void OutSample(uint8_t data) {
+  // 1us period
+  for (uint8_t i = 0; i < 8; i++) {
+    if (data & 0x80)
+      bitSet(REG_PORT, REG_DATA);
+    else
+      bitClear(REG_PORT, REG_DATA);
+ 
+    data <<= 1;
+ 
+    bitSet(REG_PORT, REG_CLK);
+    bitClear(REG_PORT, REG_CLK);
+  }
+
+  bitSet(REG_PORT, REG_LATCH);
+  bitClear(REG_PORT, REG_LATCH);
+}
+
+void setup() {
+  // put your setup code here, to run once:
+  REG_DIRECTION |= _BV(REG_DATA) | _BV(REG_CLK) | _BV(REG_LATCH);
+  bitSet(REG_PORT, REG_LATCH);
+}
+
+void loop() {
+  // put your main code here, to run repeatedly:
+  for (int i = 0; i < size; i++) {
+    OutSample(pgm_read_word_near(wav + i));
+    delayMicroseconds(62);
+  }
+  delay(1000);
+}
+
