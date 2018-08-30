@@ -11,6 +11,6 @@ def get_sine():
     d = (a + 1)*0x80
     if d >= 0xFF:
       d = 0xFF
-    print("0x%02X // %.4f" % (d, a))
+    print("0x%02X, // %.4f" % (d, a))
 
 get_sine()
