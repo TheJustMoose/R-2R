@@ -868,7 +868,7 @@ void OutSample(uint8_t data) {
 void setup() {
   // put your setup code here, to run once:
   REG_DIRECTION |= _BV(REG_DATA) | _BV(REG_CLK) | _BV(REG_LATCH);
-  bitSet(REG_PORT, REG_LATCH);
+  REG_PORT |= _BV(REG_LATCH);
 }
 
 void loop() {
